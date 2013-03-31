@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<title>Snow</title>
+	<meta name="author" content="Natalie Downe">
+	<!-- This is based on the examples for these entries on webkit.org:
+		/web/20120511001619/http://webkit.org/blog/138/css-animation/
+	 	/web/20120511001619/http://webkit.org/blog/324/css-animation-2/
+		alterations by Natalie Downe nat@natbat.net
+	-->
+	
+	<!-- Date: 2009-12-17 -->
+	
+	<style type="text/css" media="screen">
+	
+		body {
+			background-color: #A7BACB;
+			margin: 0;
+			padding: 0;
+		}
+		
+		.snowflake {
+			position: absolute;
+			text-align: center;
+			z-index: 9999;
+			top: -100px;
+			width: 1em;
+			height: 1em;
+			color: white;
+			font-size: 16px;
+			text-shadow: rgba(0, 0, 0, 0.7) 1px 1px 2px;
+			/* We use the following properties to apply the fade and drop animations to each snowflake.
+			   Each of these properties takes two values. These values respectively match a setting
+			   for fade and drop.
+			*/
+			-webkit-animation-iteration-count: infinite, 20;
+			-webkit-animation-direction: normal, normal;
+			-webkit-animation-timing-function: linear, ease-in;
+		}
+
+		.snowflake span {
+			position: absolute;
+			display: block;
+			width: 1em;
+			height: 1em;
+			/* We use the following properties to adjust the clockwiseSpin or counterclockwiseSpin
+			   animations on each snowflake.
+			   The createASnowflake function determines whether a flake has the 
+			   clockwiseSpin or counterclockwiseSpin animation.
+			*/
+			-webkit-animation-iteration-count: infinite;
+			-webkit-animation-direction: alternate;
+			-webkit-animation-timing-function: ease-in-out;
+			-webkit-transform-origin: 50% -100%;
+
+		}
+
+		.snowflake.tiny {
+			font-size: 0.5em;
+		}
+
+		.snowflake.small {
+			font-size: 1em;
+		}
+
+		.snowflake.medium {
+			font-size: 2em;
+		}
+
+		.snowflake.large {
+			font-size: 3em;
+		}
+
+		.snowflake.massive {
+			font-size: 7em;
+		}
+
+		/* Hides a snowflake towards the very end of the animation */
+		@-webkit-keyframes fade {
+			/* Show a snowflake while into or below 85 percent of the animation and hide it, otherwise */
+			0%   { opacity: 1; }
+			85%  { opacity: 1; }
+			100% { opacity: 0; }
+		}
+
+		/* Makes a snowflake fall from -50px to 650px pixels in the y-axis */
+		@-webkit-keyframes drop {
+			0%   { -webkit-transform: translate(0px, -50px); }
+			100% { -webkit-transform: translate(0px, 650px); }
+		}
+
+		/* Rotates a snowflake from -50 to 50 degrees in 2D space */
+		@-webkit-keyframes clockwiseSpin {
+			0%   { -webkit-transform: rotate(-50deg); }
+			100% { -webkit-transform: rotate(50deg); }
+		}
+
+
+		/* Rotates it from 50 to -50 degrees in 2D space */
+		@-webkit-keyframes counterclockwiseSpin  {
+			0%   { -webkit-transform: rotate(50deg); }
+			100% { -webkit-transform: rotate(-50deg); }
+		}
+
+
+
+		/* rainbow */
+		
+		html {
+			position: relative;
+			height: 100%;
+			background: #F9FEFF;
+		}
+		.rainbow {
+			width: 500px;
+			height: 240px;
+			margin: 20% auto 0 auto;
+			position: absolute;
+			left: 50%;
+			margin-left: -250px;
+			bottom:0;
+		}
+		.rainbow p {
+			text-indent: -900px;
+			margin: 0;
+			position: absolute;
+			bottom: 0;
+			width: 100%;
+			-webkit-border-top-left-radius: 600px 560px;
+			-webkit-border-top-right-radius: 600px 560px;
+			-moz-border-radius-topleft: 600px 560px;
+			-moz-border-radius-topright: 600px 560px;
+		}
+
+		.rainbow p:nth-child(1),
+		.rainbow .r {
+			background-color: #FF0000; /* red */
+			height: 240px;
+			width: 500px;
+		}
+		.rainbow p:nth-child(2),
+		.rainbow .o {	
+			background-color: #FF9900; /* orange */
+			height: 220px;
+			width: 460px;
+			left: 20px;
+		}
+		.rainbow p:nth-child(3),
+		.rainbow .y {
+			background-color: #FFFF00; /* yellow */
+			height: 200px;
+			width: 420px;
+			left: 40px;
+		}
+		.rainbow p:nth-child(4),
+		.rainbow .g {
+				   background-color: #2ECE0C;/* green */
+				height: 180px;
+				width: 380px;
+				left: 60px;
+		}
+		.rainbow p:nth-child(5),
+		.rainbow .b {
+				background-color: #0000FF; /* blue */
+				height: 160px;
+				width: 340px;
+				left: 80px;
+		}
+		.rainbow p:nth-child(6),
+		.rainbow .i {
+				   background-color: #6600FF; /* indigo */
+				height: 140px;
+				width: 300px;
+				left: 100px;
+		}
+		.rainbow p:nth-child(7),
+		.rainbow .v {
+				  background-color: #8B00FF; /* violet */
+				height: 120px;
+				width: 260px;
+				left: 120px;
+		}
+		.rainbow p:nth-last-of-type(1),
+		.rainbow p:last-child {
+				background-color: #F9FEFF;
+				height: 100px;
+				width: 220px;
+				left: 140px;
+		}
+
+	</style>
+	
+	
+	
+	<script>
+	/* Define the number of snowflakes to be used in the animation */
+	const SNOWFLAKES = 10;
+
+	function init() {
+		
+		/* Fill the empty container with freshly driven snow */
+		var first = true;
+		for (var i = 0; i < SNOWFLAKES; i++) {
+			document.body.appendChild(createASnowflake(first));
+			first = false;
+		}
+	}
+	
+	/*
+		Receives the lowest and highest values of a range and
+		returns a random integer that falls within that range.
+	*/
+	function randomInteger(low, high) {
+		return low + Math.floor(Math.random() * (high - low));
+	}
+
+	/*
+	   Receives the lowest and highest values of a range and
+	   returns a random float that falls within that range.
+	*/
+	function randomFloat(low, high) {
+		return low + Math.random() * (high - low);
+	}
+
+	function randomItem(items) {
+		return items[randomInteger(0, items.length - 1)]
+	}
+
+	/* Returns a duration value for the falling animation.*/
+	function durationValue(value) {
+		return value + 's';
+	}
+
+	function createASnowflake(is_first) {
+		var flakes = ['2746', '2745', '2744', '2733'];
+		var superFlakes = ['2746', '2745', '2744', 'fc7', '274b', '2749', '2747', '2746', '273c', '273b', '2734', '2733', '2732', '2731', '2725'];
+		var sizes = ['tiny', 'tiny', 'tiny', 'small', 'small', 'small', 'small', 'medium', 'medium', 'medium', 'medium', 'medium', 'medium', 'large', 'massive'];
+
+		/* Start by creating a wrapper div, and an empty span  */
+		var snowflakeElement = document.createElement('div');
+		snowflakeElement.className = 'snowflake ' + randomItem(sizes);
+
+		var snowflake = document.createElement('span');
+		snowflake.innerHTML = '&#x' + randomItem(flakes) + ';';
+
+		snowflakeElement.appendChild(snowflake);
+
+		/* Randomly choose a spin animation */
+		var spinAnimationName = (Math.random() < 0.5) ? 'clockwiseSpin' : 'counterclockwiseSpin';
+
+		 /* Randomly choose a side to anchor to, keeps the middle more dense and fits liquid layout */
+		 var anchorSide = (Math.random() < 0.5) ? 'left' : 'right';
+
+		/* Figure out a random duration for the fade and drop animations */
+		var fadeAndDropDuration = durationValue(randomFloat(5, 11));
+
+		/* Figure out another random duration for the spin animation */
+		var spinDuration = durationValue(randomFloat(4, 8));
+
+		// how long to wait before the flakes arrive
+		var flakeDelay = is_first ? 0 : durationValue(randomFloat(0, 10));
+
+		snowflakeElement.style.webkitAnimationName = 'fade, drop';
+		snowflakeElement.style.webkitAnimationDuration = fadeAndDropDuration + ', ' + fadeAndDropDuration;
+		snowflakeElement.style.webkitAnimationDelay = flakeDelay;
+
+		/* Position the snowflake at a random location along the screen, anchored to either the left or the right*/
+		snowflakeElement.style[anchorSide] = randomInteger(0, 60) + '%';
+
+		snowflake.style.webkitAnimationName = spinAnimationName;
+		snowflake.style.webkitAnimationDuration = spinDuration;
+
+
+		/* Return this snowflake element so it can be added to the document */
+		return snowflakeElement;
+	}
+
+
+	window.onload = init;
+
+	
+	</script>
+</head>
+<body>
+
+
+
+	<div id="snowdrift"><!-- Happy Christmas everyone! --></div>
+	
+	<div class="rainbow">
+		   <p class="r">red</p>
+		   <p class="o">orange</p>
+		   <p class="y">yellow</p>
+		   <p class="g">green</p>
+		   <p class="b">blue</p>
+		   <p class="i">indigo</p>
+		   <p class="v">violet</p>
+		   <p>the end</p>
+	</div>
+	
+
+
+
+</body></html>
